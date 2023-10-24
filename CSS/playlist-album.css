@@ -1,0 +1,27 @@
+
+
+
+
+
+
+/* ASIDE */
+aside {
+    margin: 0% 1% 1% 1%;
+    width: 100px;
+    float: left;
+}
+aside > a {
+    border: 1px solid black;
+    text-decoration: none;
+    color: rgba(0, 0, 255, 0.5);
+}
+
+
+
+/* GALERIE + CARTES */
+.galerie {
+    width: 70%;
+}
+.card {
+    width: 10rem;
+}
