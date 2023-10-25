@@ -22,6 +22,7 @@ aside > a {
 .galerie {
     width: 70%;
 }
-.card {
+.card,
+#card {
     width: 10rem;
 }
