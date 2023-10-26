@@ -1,14 +1,18 @@
 // VARIABLES
-let swapvar = 0;                    // variable dont la valeur initiale est 0
+let tabIndex = 0;
 let lecteur = document.getElementById('lecteur');
 let songduration = document.getElementById('songduration');
-// let playlist = [
-//     './media/Bonobo - Kiara.mp3',
-//     './media/ReRe.mp3',
-//     './media/Arctic Monkeys - Fluorescent Adolescent.mp3',
-//     './media/Gorillaz - Feel Good Inc HD.mp3',
-//     './media/BLAUDZUN - PROMISES OF NO MANS LAND (Official Audio).mp3',
-// ];
+
+/* OLD PLAYLIST
+let playlist = [
+    './media/Bonobo - Kiara.mp3',
+    './media/ReRe.mp3',
+    './media/Arctic Monkeys - Fluorescent Adolescent.mp3',
+    './media/Gorillaz - Feel Good Inc HD.mp3',
+    './media/BLAUDZUN - PROMISES OF NO MANS LAND (Official Audio).mp3',
+];
+*/
+
 let playlistcard = [
     {
         audioFile: './media/Bonobo - Kiara.mp3',
@@ -39,7 +43,7 @@ let playlistcard = [
         artistName: 'Blaudzun',
         songName: "Promises of no man's land",
         imageFile: './media/album-blaudzun.jpg'
-    },
+    }
 ]
 
 let cardContainer = document.getElementById("cardcontainer");
@@ -54,7 +58,7 @@ function init() {
         // Création d'un élément carte
         let card = document.createElement("div");
         card.className = "card";
-        card.setAttribute("onclick", "playalbum(" + [i] + ")"); // Assurez-vous que playalbum(i) est correctement défini
+        card.setAttribute("onclick", "playalbum(" + [i] + ")");
 
         // Création de l'image
         let cardImage = document.createElement("img");
@@ -66,11 +70,12 @@ function init() {
         let cardBody = document.createElement("div");
         cardBody.className = "card-body";
 
-        // Création du titre + artiste
+        // Création de l'artiste
         let cardTitle = document.createElement("h5");
         cardTitle.className = "card-title";
         cardTitle.textContent = cardData.artistName;
 
+        // Création du titre
         let cardText = document.createElement("p");
         cardText.className = "card-text";
         cardText.textContent = cardData.songName;
@@ -83,20 +88,17 @@ function init() {
         cardContainer.appendChild(card);
     }
 
-
-
-
-
     // lecteur.src = playlist[0];
     lecteur.src = playlistcard[0]['audioFile']
 }
 
 function play() {
     if (lecteur.paused) {
-    lecteur.play();
+        lecteur.play();
     } else {
         lecteur.pause();
     }
+    trackInfo(tabIndex)
 }
 
 function voldown() {
@@ -118,36 +120,33 @@ function volchange() {
 }
 
 function next() {
-
-
-// COUILLE PRESENTE A FAIRE DEMAIN COURAGE
-    lecteur.src = playlistcard[++swapvar]['audioFile'];          // incrémentation en préfixe pour commencer à la valeur de swapvar (= 0)
-    if (swapvar === playlistcard.length) {
-        swapvar = 0;
-        lecteur.src = playlistcard[swapvar]['audioFile'];
+    if (tabIndex < playlistcard.length - 1) {
+        lecteur.src = playlistcard[++tabIndex]['audioFile'];        // incrémentation en préfixe pour commencer à la valeur de tabIndex (= 0)
+    } else {
+        tabIndex = 0;
+        lecteur.src = playlistcard[tabIndex]['audioFile'];
     }
-    lecteur.play();
-
-
-
-
+    lecteur.autoplay = true;
+    trackInfo(tabIndex)
 }
 
 function previous() {
-    if (swapvar === 0) {
-        swapvar = playlistcard.length;
+    if (tabIndex == 0) {
+        tabIndex = playlistcard.length;
     }
-    lecteur.src = playlistcard[--swapvar]['audioFile'];
-    lecteur.play()
+    lecteur.src = playlistcard[--tabIndex]['audioFile'];
+    lecteur.autoplay = true;
+    trackInfo(tabIndex)
 }
 
-function playalbum(swapvar) {
-    if (swapvar === 0) {
-        lecteur.src = playlistcard[0]['audioFile'];            /////// 
-    } else {
-        lecteur.src = playlistcard[swapvar++]['audioFile'];
-    }
-    lecteur.play()
+function playalbum(tabIndex) {
+    // if (tabIndex == 0) {
+    //     lecteur.src = playlistcard[0]['audioFile'];
+    // } else {
+    lecteur.src = playlistcard[tabIndex]['audioFile'];
+    // }
+    lecteur.play();
+    trackInfo(tabIndex)
 }
 
 // Fonction permettant de changer la durée de ma musique
@@ -165,3 +164,34 @@ function changeduration() {
     songduration.setAttribute("max", lecteur.duration);
 }
 
+// AFFICHAGE DYNAMIQUE DES INFOS
+function trackInfo(tabIndex) {
+    document.getElementById('artist-name').textContent = playlistcard[tabIndex]['artistName']
+    document.getElementById('track-name').textContent = playlistcard[tabIndex]['songName']
+
+    // Affichage de la durée de la piste à l'instant T
+    let trackCurrent = setInterval(function () {
+        let mins = Math.floor(lecteur.currentTime / 60);            // On utilise math.floor pour obtenir une durée en minutes
+        let secs = Math.floor(lecteur.currentTime % 60);            // On utilise % pour obtenir le restant en secondes
+        if (secs < 10) {    // Entre 0 et 9sec, on affiche un 0 devant pour garder un format à 2 chiffres              
+            secs = '0' + String(secs);
+        }
+        if (mins < 10) {    // Même chose pour les musiques (pour les fans de Tools...)
+            mins = '0' + String(mins);
+        }
+        document.getElementById('track-current').innerHTML = mins + ':' + secs;
+    }, 1000)                 // setInterval = Actualisation en ms (ici 1s)
+
+    // Affichage de la durée totale de la piste
+    let trackEnd = setTimeout(function () {
+        let mins = Math.floor(lecteur.duration / 60);
+        let secs = Math.floor(lecteur.duration % 60);
+        if (secs < 10) {
+            secs = '0' + String(secs);
+        }
+        if (mins < 10) {
+            mins = '0' + String(mins);
+        }
+        document.getElementById('track-end').innerHTML = mins + ':' + secs;
+    }, 100)                 // setTimeout = exécution du code après 0.1s
+}
